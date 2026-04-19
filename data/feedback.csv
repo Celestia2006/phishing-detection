@@ -1,0 +1,4 @@
+timestamp,url,predicted_label,correct_label,having_IP_Address,URL_Length,Shortining_Service,having_At_Symbol,double_slash_redirecting,Prefix_Suffix,having_Sub_Domain,SSLfinal_State,Domain_registeration_length,Favicon,port,HTTPS_token,Request_URL,URL_of_Anchor,Links_in_tags,SFH,Submitting_to_email,Abnormal_URL,Redirect,on_mouseover,RightClick,popUpWidnow,Iframe,age_of_domain,DNSRecord,Page_Rank,Google_Index,Statistical_report
+2026-03-28 10:07:16,http://paypal-secure-login.xyz/verify,phishing,legitimate,1,1,1,1,1,-1,1,0,-1,-1,1,1,-1,-1,-1,-1,-1,-1,0,-1,-1,-1,-1,-1,-1,0,0,0
+2026-03-28 10:07:58,http://127.0.0.1:8000/docs#/default/submit_feedback_feedback_post,phishing,legitimate,-1,0,1,1,1,1,-1,0,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,0,-1,-1,-1,-1,-1,1,0,0,0
+2026-04-19 22:57:55,http://paypal-secure-login.xyz/verify,phishing,legitimate,1,1,1,1,1,-1,1,0,-1,-1,1,1,-1,-1,-1,-1,-1,-1,0,-1,-1,-1,-1,-1,-1,0,0,0

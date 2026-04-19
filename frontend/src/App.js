@@ -494,14 +494,35 @@ export default function App() {
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
 
-  const handleScan = () => {
+  const handleScan = async () => {
     if (!url.trim()) return;
     setResult(null);
     setScanning(true);
-    setTimeout(() => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      const data = await response.json();
+      setResult({
+        url,
+        safe: !data.is_phishing,
+        trust: data.trust_score,
+        label: data.is_phishing ? "Phishing Detected" : "Legitimate Website",
+        warning: data.warning,
+      });
+    } catch (error) {
+      setResult({
+        url,
+        safe: false,
+        trust: 0,
+        label: "Error — Could not reach backend",
+        warning: null,
+      });
+    } finally {
       setScanning(false);
-      setResult({ ...MOCK_RESULT, url });
-    }, 2000);
+    }
   };
 
   const handleKey = (e) => {
