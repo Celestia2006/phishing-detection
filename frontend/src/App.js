@@ -671,16 +671,17 @@ export default function App() {
   };
 
   const getStatusInfo = () => {
-    if (!result) return { label: "", color: "", icon: "" };
-    const { is_phishing, confidence } = result.prediction;
-    if (is_phishing) {
-      return { label: "PHISHING", color: "phishing", icon: "⚠️" };
-    } else if (confidence < 70) {
-      return { label: "SUSPICIOUS", color: "suspicious", icon: "⚡" };
-    } else {
-      return { label: "SAFE", color: "safe", icon: "🛡️" };
-    }
-  };
+  if (!result) return { label: "", color: "", icon: "" };
+  const { is_phishing, confidence } = result.prediction;
+
+  if (!is_phishing) {
+    return { label: "SAFE", color: "safe", icon: "🛡️" };
+  } else if (confidence < 70) {
+    return { label: "SUSPICIOUS", color: "suspicious", icon: "⚡" };
+  } else {
+    return { label: "PHISHING", color: "phishing", icon: "⚠️" };
+  }
+};
 
   const getRiskLevel = (score) => {
     if (score >= 80) return { label: "Safe", color: "low" };
@@ -835,26 +836,95 @@ export default function App() {
                 </div>
               </div>
             </div>
-
-            {/* SHAP CARD */}
+           {/* SHAP CARD */}
             <div className="card card-enter" style={{ animationDelay: '0.3s' }}>
-              <div className="card-title">
-                <span className="card-icon">🤖</span>
-                AI Explainability
-              </div>
-              <div className="shap-list">
-                {result.explanation?.local_features?.slice(0, 5).map((feature, index) => (
-                  <div key={index} className="shap-item">
-                    <span className="shap-text">{feature.label}</span>
-                    <div className="shap-bar">
-                      <div
-                        className={`shap-fill ${feature.shap_value > 0 ? 'positive' : 'negative'}`}
-                        style={{ width: `${Math.abs(feature.shap_value) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="card-title">
+            <span className="card-icon">🤖</span>
+            AI Explainability
+            </div>
+
+            {/* use global_features; fall back to local_features if absent */}
+            {(() => {
+            const features = result.explanation?.global_features?.length
+              ? result.explanation.global_features
+              : result.explanation?.local_features || [];
+
+            if (!features.length) {
+              return <p style={{ fontFamily: 'var(--mono)', fontSize: '12px', color: 'var(--muted)' }}>No explanation data available.</p>;
+            }
+
+            const maxAbs = Math.max(...features.map(f => Math.abs(f.shap_value)), 0.001);
+            const isPhishing = result.prediction.is_phishing;
+
+            return (
+              <>
+                <p style={{ fontFamily: 'var(--mono)', fontSize: '11px', color: 'var(--muted)', marginBottom: '16px', lineHeight: '1.6' }}>
+                  Features ranked by influence on this prediction. Red bars pushed toward phishing, green toward safe.
+                </p>
+                <div className="shap-list">
+                  {features.map((feature, index) => {
+                    const pct = (Math.abs(feature.shap_value) / maxAbs) * 100;
+                    // For global features: high shap_value = important for phishing detection
+                    // Color depends on whether this feature is a risk signal or a safety signal
+                    const isRisk = isPhishing
+                      ? feature.shap_value > 0
+                      : feature.shap_value < 0;
+
+                    return (
+                      <div key={index} style={{ marginBottom: '10px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <span style={{ fontFamily: 'var(--mono)', fontSize: '11px', color: 'var(--text)' }}>
+                            {feature.label}
+                          </span>
+                          <span style={{
+                            fontFamily: 'var(--mono)',
+                            fontSize: '10px',
+                            color: isRisk ? 'var(--danger)' : 'var(--accent)',
+                            fontWeight: '700'
+                          }}>
+                            {isRisk ? '▲ Risk' : '✓ Safe'}
+                          </span>
+                        </div>
+                        <div style={{
+                          height: '8px',
+                          background: 'var(--border)',
+                          borderRadius: '4px',
+                          overflow: 'hidden'
+                        }}>
+                          <div style={{
+                            width: `${pct}%`,
+                            height: '100%',
+                            borderRadius: '4px',
+                            background: isRisk ? 'var(--danger)' : 'var(--accent)',
+                            transition: 'width 0.6s ease',
+                          }} />
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '3px' }}>
+                          <span style={{ fontFamily: 'var(--mono)', fontSize: '10px', color: 'var(--muted)' }}>
+                            importance: {(Math.abs(feature.shap_value) * 100).toFixed(1)}%
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{
+                  marginTop: '16px',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  background: 'var(--bg)',
+                  border: '1px solid var(--border)',
+                  fontFamily: 'var(--mono)',
+                  fontSize: '11px',
+                  color: 'var(--muted)',
+                  lineHeight: '1.6'
+                }}>
+                  Base rate: {(result.explanation.base_value * 100).toFixed(0)}% phishing probability before features applied.
+                  Model: {result.explanation.model_used}
+                </div>
+              </>
+            );
+            })()}
             </div>
 
             {/* FEATURES CARD */}
@@ -874,9 +944,8 @@ export default function App() {
                 ))}
               </div>
             </div>
-
             {/* FEEDBACK CARD */}
-            <div className="card card-enter" style={{ animationDelay: '0.5s' }}>
+            <div className="card card-enter" style={{ animationDelay: '0.5s', justifySelf: 'center', width: '100%', maxWidth: '400px' }}>
               <div className="card-title">
                 <span className="card-icon">💬</span>
                 User Feedback
@@ -901,6 +970,28 @@ export default function App() {
                 </div>
               )}
             </div>
+            <div></div>
+            <button
+              onClick={() => { setResult(null); setUrl(""); setFeedback(null); }}
+              style={{
+                background: 'var(--bg)',
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                padding: '6px 14px',
+                color: 'var(--accent)',
+                fontFamily: 'var(--mono)',
+                fontSize: '21px',
+                cursor: 'pointer',
+                // display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-mid)'; e.currentTarget.style.color = 'var(--accent)'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--accent)'; }}
+            >
+              ← New Scan
+            </button>
           </main>
         )}
       </div>
