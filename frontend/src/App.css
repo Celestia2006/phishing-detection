@@ -616,16 +616,15 @@ nav {
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 14px 18px;
+  padding: 18px 50px 14px 18px;
   font-family: var(--mono);
   font-size: 13px;
   color: var(--text);
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
-  min-width: 0;
+  min-width: 600px;
   position: relative;
 }
-
 .url-input::placeholder { color: var(--muted); }
 
 .url-input:focus {

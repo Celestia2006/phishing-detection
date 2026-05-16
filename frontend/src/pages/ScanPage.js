@@ -68,14 +68,6 @@ const MODEL_INFO = {
     icon: "📈",
     desc: "Fast, linear classifier. Great baseline.",
   },
-  SVM: {
-    icon: "🔷",
-    desc: "Margin-based classifier. Strong on high-dimensional data.",
-  },
-  KNN: {
-    icon: "🟠",
-    desc: "Instance-based learner. Classifies by nearest neighbors.",
-  },
   "Random Forest": {
     icon: "🌲",
     desc: "Ensemble of decision trees. Handles noisy features well.",
@@ -126,6 +118,19 @@ export default function ScanPage({ onNewScan }) {
 
   const handleScan = async () => {
     if (!url.trim()) return;
+
+    // Validate URL format before hitting the backend
+    try {
+      const testUrl =
+        url.startsWith("http://") || url.startsWith("https://")
+          ? url
+          : "http://" + url;
+      new URL(testUrl);
+    } catch {
+      alert("Please provide a proper URL");
+      return;
+    }
+
     setResult(null);
     setScanning(true);
     setCurrentStep(0);
@@ -145,6 +150,15 @@ export default function ScanPage({ onNewScan }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
       });
+
+      // Handle backend validation errors (e.g. 422 Invalid URL)
+      if (!response.ok) {
+        alert("Please provide a proper URL");
+        setScanning(false);
+        clearInterval(stepInterval);
+        return;
+      }
+
       const data = await response.json();
       setResult(data);
     } catch {
@@ -220,18 +234,17 @@ export default function ScanPage({ onNewScan }) {
             predictions.
           </p>
 
-          <div className="input-card">
+          <div className="input-card" style={{ maxWidth: "860px" }}>
             <div className="input-row">
               <div style={{ position: "relative", flex: 1 }}>
                 <input
                   className="url-input"
                   type="text"
-                  placeholder="Enter website URL to analyze"
+                  placeholder="Enter website URL to analyze 🔍"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   onKeyDown={handleKey}
                 />
-                <span className="input-icon">🔍</span>
               </div>
               <button
                 className="nav-link cta"
