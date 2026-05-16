@@ -37,6 +37,8 @@ DATA_PATH    = os.path.join(os.path.dirname(__file__), "..", "data", "phishing.c
 
 MODEL_PATHS  = {
     "Logistic Regression" : os.path.join(MODELS_DIR, "model_lr.pkl"),
+    "SVM"                 : os.path.join(MODELS_DIR, "model_svm.pkl"),
+    "KNN"                 : os.path.join(MODELS_DIR, "model_knn.pkl"),
     "Random Forest"       : os.path.join(MODELS_DIR, "model_rf.pkl"),
     "XGBoost"             : os.path.join(MODELS_DIR, "model_xgb.pkl"),
 }
@@ -64,7 +66,7 @@ class PredictionResult:
     confidence  : float                      # primary model's confidence
     trust_score : int                        # primary model's trust score (0–100)
     model_used  : str                        # name of best model
-    all_scores  : list[ModelScore]           # all three models (for comparison panel)
+    all_scores  : list[ModelScore]           # all five models (for comparison panel)
     features    : dict                       # raw feature dict (for SHAP in explainer.py)
     is_phishing : bool                       # convenience bool for frontend logic
     warning     : Optional[str] = None       # real-time warning message if phishing
@@ -134,11 +136,14 @@ class ModelRegistry:
 
         X_val_scaled = self.scaler.transform(X_val)
 
+        # Models that require scaled input
+        SCALED_MODELS = {"Logistic Regression", "SVM", "KNN"}
+
         best_f1   = -1.0
         best_name = "XGBoost"
 
         for name, model in self.models.items():
-            X_input = X_val_scaled if name == "Logistic Regression" else X_val
+            X_input = X_val_scaled if name in SCALED_MODELS else X_val
             y_pred  = model.predict(X_input)
             score   = f1_score(y_val, y_pred)
             if score > best_f1:
@@ -247,8 +252,11 @@ def predict(features: dict) -> PredictionResult:
 
     all_scores = []
 
+    # Models that require scaled input
+    SCALED_MODELS = {"Logistic Regression", "SVM", "KNN"}
+
     for name, model in registry.models.items():
-        X_input = df_scaled if name == "Logistic Regression" else df_input
+        X_input = df_scaled if name in SCALED_MODELS else df_input
 
         raw_pred   = model.predict(X_input)[0]
         proba      = model.predict_proba(X_input)[0]
