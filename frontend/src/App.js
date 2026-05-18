@@ -1,6 +1,8 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import "./App.css";
 import ScanPage from "./pages/ScanPage";
+import CompareModels from "./pages/CompareModels";
+import AboutPage from "./pages/AboutPage";
 
 // ─── Landing Page ─────────────────────────────────────────────────────────────
 function LandingPage({ onNavigate }) {
@@ -182,70 +184,14 @@ function LandingPage({ onNavigate }) {
   );
 }
 
-// ─── About Page (placeholder) ─────────────────────────────────────────────────
-function AboutPage() {
-  return (
-    <div
-      style={{
-        flex: 1,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "80px 24px",
-        textAlign: "center",
-      }}
-    >
-      <div>
-        <p
-          style={{
-            fontFamily: "var(--mono)",
-            fontSize: "11px",
-            color: "var(--accent)",
-            letterSpacing: "3px",
-            textTransform: "uppercase",
-            marginBottom: "12px",
-          }}
-        >
-          Coming Soon
-        </p>
-        <h1
-          style={{
-            fontSize: "clamp(32px, 5vw, 56px)",
-            fontWeight: "800",
-            letterSpacing: "-2px",
-            marginBottom: "16px",
-          }}
-        >
-          About PhishGuard
-        </h1>
-        <p
-          style={{
-            fontFamily: "var(--mono)",
-            fontSize: "13px",
-            color: "var(--muted)",
-            maxWidth: "400px",
-            lineHeight: "1.9",
-          }}
-        >
-          This page will cover the team, the research paper, and the model
-          details.
-        </p>
-      </div>
-    </div>
-  );
-}
-
 // ─── App ──────────────────────────────────────────────────────────────────────
 export default function App() {
   const [page, setPage] = useState("home");
 
-  // scanKey forces ScanPage to fully remount when the nav Scan button is clicked
-  // while already on the scan page — this resets all internal state cleanly.
   const [scanKey, setScanKey] = useState(0);
 
   const handleNavigate = (target) => {
     if (target === "scan" && page === "scan") {
-      // Already on scan page — reset it instead of re-navigating
       setScanKey((k) => k + 1);
     } else {
       setPage(target);
@@ -281,7 +227,10 @@ export default function App() {
             >
               About
             </button>
-            <button className="nav-link disabled" title="Coming soon">
+            <button
+              className={`nav-link ${page === "compare" ? "active" : ""}`}
+              onClick={() => handleNavigate("compare")}
+            >
               Compare Models
             </button>
           </div>
@@ -290,6 +239,7 @@ export default function App() {
         {/* ─── PAGE ROUTER ─── */}
         {page === "home" && <LandingPage onNavigate={handleNavigate} />}
         {page === "about" && <AboutPage />}
+        {page === "compare" && <CompareModels onNavigate={handleNavigate} />}
         {page === "scan" && (
           <ScanPage key={scanKey} onNewScan={() => setScanKey((k) => k + 1)} />
         )}
