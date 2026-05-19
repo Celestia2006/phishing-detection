@@ -43,6 +43,38 @@
   width: 100%;
 }
 
+.about-section.alt-bg {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  max-width: 100%;
+  padding: 80px 48px;
+}
+
+.about-section.alt-bg > * {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Stats paragraph — phishing real-world impact */
+.stats-paragraph {
+  max-width: 860px;
+  margin: 0 auto 40px;
+}
+
+.stats-paragraph p {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.9;
+}
+
+.stats-paragraph p strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
 /* Mission cards */
 .mission-cards {
   display: grid;
@@ -89,111 +121,229 @@
   font-weight: 600;
 }
 
-/* Team grid */
+/* Tech description + feature list */
+.tech-description {
+  max-width: 860px;
+  margin: 0 auto 48px;
+}
+
+.tech-description > p {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.9;
+  margin-bottom: 24px;
+}
+
+.tech-description > p strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.tech-description > p a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feature-list li {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+  padding: 14px 18px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.feature-list li strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Tech stack grid */
+.tech-stack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.tech-stack-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.tech-stack-card h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.tech-stack-card .tech-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tech-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  border-radius: 6px;
+  padding: 4px 10px;
+  letter-spacing: 0.5px;
+}
+
+/* Team grid — minimalist frames */
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
   margin-bottom: 40px;
 }
 
-.team-card {
+.team-frame {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 36px 28px;
-  text-align: center;
+  border-radius: 12px;
+  overflow: hidden;
   transition: all 0.25s;
 }
 
-.team-card:hover {
+.team-frame:hover {
   border-color: var(--accent-mid);
   box-shadow: 0 0 40px var(--accent-dim);
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 }
 
-.team-avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
+.team-frame-header {
+  padding: 10px 20px;
   background: var(--accent-dim);
-  border: 2px solid var(--accent-mid);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  margin: 0 auto 18px;
+  border-bottom: 1px solid var(--border);
 }
 
-.team-card h3 {
+.team-frame-role {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.team-frame-body {
+  padding: 24px 20px;
+}
+
+.team-frame-body h3 {
   font-size: 18px;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
   color: var(--text);
 }
 
-.team-role {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--accent);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.team-desc {
+.team-frame-body p {
   font-family: var(--mono);
   font-size: 12px;
   color: var(--muted);
   line-height: 1.7;
-  margin-top: 12px;
 }
 
-/* Guide card */
-.guide-card {
-  max-width: 500px;
-  margin: 0 auto;
+/* Guide frame — first, prominent */
+.guide-frame {
+  max-width: 600px;
+  margin: 0 auto 40px;
   background: linear-gradient(135deg, var(--accent-dim), transparent);
   border: 1px solid var(--accent-mid);
-  border-radius: 14px;
-  padding: 28px 32px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-.guide-icon {
-  font-size: 40px;
-  flex-shrink: 0;
+.guide-frame-header {
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--accent-mid);
 }
 
-.guide-label {
+.guide-frame-badge {
   font-family: var(--mono);
   font-size: 10px;
   color: var(--accent);
   letter-spacing: 2px;
   text-transform: uppercase;
-  margin-bottom: 4px;
+  font-weight: 700;
 }
 
-.guide-card h3 {
-  font-size: 20px;
+.guide-frame-body {
+  padding: 24px;
+}
+
+.guide-frame-body h3 {
+  font-size: 22px;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
-.guide-dept {
+.guide-frame-body p {
   font-family: var(--mono);
   font-size: 12px;
   color: var(--muted);
   line-height: 1.6;
 }
 
+/* Acknowledgements */
+.acknowledgements-card {
+  max-width: 800px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 36px 32px;
+}
+
+.acknowledgements-card p {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.9;
+  margin-bottom: 16px;
+}
+
+.acknowledgements-card p:last-child {
+  margin-bottom: 0;
+}
+
+.acknowledgements-card p strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.acknowledgements-card a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  word-break: break-all;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .about-hero { padding: 60px 20px 40px; }
   .about-section { padding: 60px 24px; }
+  .about-section.alt-bg { padding: 60px 24px; }
   .mission-cards { grid-template-columns: 1fr; }
   .team-grid { grid-template-columns: 1fr; }
-  .guide-card { flex-direction: column; text-align: center; }
+  .tech-stack-grid { grid-template-columns: 1fr; }
 }
