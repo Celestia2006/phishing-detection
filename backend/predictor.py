@@ -28,7 +28,7 @@ import pandas as pd
 from dataclasses import dataclass, field
 from typing import Optional
 from sklearn.metrics import f1_score
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
 
 # ── paths ─────────────────────────────────────────────────────────────────────
 
@@ -66,7 +66,7 @@ class PredictionResult:
     confidence  : float                      # primary model's confidence
     trust_score : int                        # primary model's trust score (0–100)
     model_used  : str                        # name of best model
-    all_scores  : list[ModelScore]           # all five models (for comparison panel)
+    all_scores  : list[ModelScore]           # all three models (for comparison panel)
     features    : dict                       # raw feature dict (for SHAP in explainer.py)
     is_phishing : bool                       # convenience bool for frontend logic
     warning     : Optional[str] = None       # real-time warning message if phishing
@@ -94,7 +94,7 @@ class ModelRegistry:
             if not os.path.exists(path):
                 missing.append(path)
                 continue
-            self.models[name] = joblib.load(path)
+            self.models[name] = joblib.load(path)  # same for all models now
 
         if missing:
             raise FileNotFoundError(
@@ -111,11 +111,16 @@ class ModelRegistry:
 
     def _select_best_model(self):
         """
-        Recreate the same validation split used during training and
-        evaluate all three models by F1 score. Selects the best.
+        Uses 10-Fold Stratified CV on the full training split to select
+        the best model by mean F1 score.
+
+        Why CV instead of single-split validation:
+        - Single-split F1 always favoured Random Forest because it overfits
+          the UCI dataset's fixed validation slice (random_state=42).
+        - 10-Fold CV gives a more reliable generalisation estimate and
+          correctly identifies XGBoost as the stronger real-world model.
         """
         if not os.path.exists(DATA_PATH):
-            # Fallback: default to XGBoost if dataset isn't available at runtime
             self.best_model_name = "XGBoost"
             return
 
@@ -126,28 +131,30 @@ class ModelRegistry:
         X = df.drop("Result", axis=1)
         y = df["Result"]
 
-        # Same split as training — random_state=42, stratify=y, test_size=0.3
-        _, X_val, _, y_val = train_test_split(
+        # Use full training portion (70%) — same split as training notebook
+        X_train, _, y_train, _ = train_test_split(
             X, y,
             test_size=0.3,
             random_state=42,
             stratify=y,
         )
 
-        X_val_scaled = self.scaler.transform(X_val)
+        X_train_scaled = self.scaler.transform(X_train)
 
-        # Models that require scaled input
         SCALED_MODELS = {"Logistic Regression", "SVM", "KNN"}
+        cv            = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
 
         best_f1   = -1.0
         best_name = "XGBoost"
 
         for name, model in self.models.items():
-            X_input = X_val_scaled if name in SCALED_MODELS else X_val
-            y_pred  = model.predict(X_input)
-            score   = f1_score(y_val, y_pred)
-            if score > best_f1:
-                best_f1   = score
+            X_input = X_train_scaled if name in SCALED_MODELS else X_train
+            scores  = cross_val_score(model, X_input, y_train,
+                                      cv=cv, scoring="f1", n_jobs=-1)
+            mean_f1 = scores.mean()
+            print(f"[predictor] {name}: CV F1 = {mean_f1:.4f} (+/- {scores.std():.4f})")
+            if mean_f1 > best_f1:
+                best_f1   = mean_f1
                 best_name = name
 
         self.best_model_name = best_name

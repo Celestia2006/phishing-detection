@@ -68,6 +68,14 @@ const MODEL_INFO = {
     icon: "📈",
     desc: "Fast, linear classifier. Great baseline.",
   },
+  SVM: {
+    icon: "🔷",
+    desc: "Margin-based classifier. Strong on high-dimensional data.",
+  },
+  KNN: {
+    icon: "🟠",
+    desc: "Instance-based learner. Classifies by nearest neighbors.",
+  },
   "Random Forest": {
     icon: "🌲",
     desc: "Ensemble of decision trees. Handles noisy features well.",
@@ -108,12 +116,36 @@ export default function ScanPage({ onNewScan }) {
   const [result, setResult] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [feedback, setFeedback] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   const resetScan = () => {
     setResult(null);
     setUrl("");
     setFeedback(null);
     if (onNewScan) onNewScan();
+  };
+
+  const handleCopy = () => {
+    if (!result) return;
+    const p = result.prediction;
+    const summary = [
+      `PhishGuard AI — Scan Summary`,
+      `─────────────────────────────`,
+      `URL      : ${url}`,
+      `Verdict  : ${p.is_phishing ? "⚠ Phishing" : "✓ Safe"}`,
+      `Confidence: ${(p.confidence * 100).toFixed(1)}%`,
+      `Trust Score: ${p.trust_score}/100`,
+      `Model Used: ${p.model_used}`,
+      `─────────────────────────────`,
+      `Model Votes:`,
+      ...(result.model_comparison || []).map(
+        (m) => `  ${m.name}: ${m.label} (${Math.round(m.confidence * 100)}%)`,
+      ),
+    ].join("\n");
+    navigator.clipboard.writeText(summary).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   };
 
   const handleScan = async () => {
@@ -651,7 +683,7 @@ export default function ScanPage({ onNewScan }) {
                 marginBottom: "20px",
               }}
             >
-              Three models voted independently. Here's what each one said.
+              Five models voted independently. Here's what each one said.
             </p>
 
             <div
@@ -854,9 +886,34 @@ export default function ScanPage({ onNewScan }) {
           {/* SCAN SUMMARY + QUICK TIPS CARD */}
           <div className="card card-enter" style={{ animationDelay: "0.6s" }}>
             {/* ── Scan Summary ── */}
-            <div className="card-title">
-              <span className="card-icon">🔎</span>
-              Scan Summary
+            <div
+              className="card-title"
+              style={{ justifyContent: "space-between" }}
+            >
+              <span
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <span className="card-icon">🔎</span>
+                Scan Summary
+              </span>
+              <button
+                onClick={handleCopy}
+                style={{
+                  fontFamily: "var(--mono)",
+                  fontSize: "10px",
+                  letterSpacing: "1px",
+                  textTransform: "uppercase",
+                  padding: "5px 12px",
+                  borderRadius: "6px",
+                  border: `1px solid ${copied ? "var(--accent)" : "var(--border)"}`,
+                  background: copied ? "var(--accent-dim)" : "transparent",
+                  color: copied ? "var(--accent)" : "var(--muted)",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                }}
+              >
+                {copied ? "✓ Copied!" : "⎘ Copy"}
+              </button>
             </div>
             <div
               style={{

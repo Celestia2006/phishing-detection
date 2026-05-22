@@ -26,7 +26,7 @@ const TEAM = [
 
 const TECH_STACK = [
   { category: "Backend", items: ["FastAPI", "Python", "Scikit-learn", "XGBoost", "SHAP", "python-whois"] },
-  { category: "Frontend", items: ["React.js", "CSS3", "Responsive Design", "Dark Theme UI"] },
+  { category: "Frontend", items: ["React.js", "CSS3", "Vite"] },
   { category: "ML Models", items: ["Logistic Regression", "SVM", "KNN", "Random Forest", "XGBoost"] },
   { category: "Feature Engineering", items: ["28 URL-based features", "DNS/WHOIS lookups", "HTML page analysis", "External API integration"] },
 ];
@@ -60,21 +60,22 @@ export default function AboutPage() {
 
         <div className="stats-paragraph">
           <p>
-            Phishing remains one of the most pervasive and damaging cyber threats
-            in the world today. Over <strong>3.4 billion phishing emails</strong> are
-            sent every single day, and phishing is cited as the initial attack
-            vector in more than <strong>80% of reported security incidents</strong>
-            globally. It serves as the primary delivery mechanism for ransomware
-            campaigns, business email compromise, and credential theft — attacks
-            that have crippled hospitals, governments, and Fortune 500 companies.
-            Organizations lose an estimated <strong>$10 billion annually</strong> to
-            phishing-related fraud, while the average cost of a data breach
-            involving phishing exceeds $4.9 million. Traditional blacklist-based
-            defenses cannot keep pace with attackers who spin up convincing fake
-            portals in minutes. PhishGuard was built to close that gap with
-            AI-driven, real-time detection that works even on brand-new domains,
-            providing explainable verdicts that users can trust and auditors can
-            verify.
+            Phishing remains one of the most pervasive and damaging cyber
+            threats in the world today. Over{" "}
+            <strong>3.4 billion phishing emails</strong> are sent every single
+            day, and phishing is cited as the initial attack vector in more than{" "}
+            <strong>80% of reported security incidents</strong>
+            {" "}globally. It serves as the primary delivery mechanism for
+            ransomware campaigns, business email compromise, and credential
+            theft — attacks that have crippled hospitals, governments, and
+            Fortune 500 companies. Organizations lose an estimated{" "}
+            <strong>$10 billion annually</strong> to phishing-related fraud,
+            while the average cost of a data breach involving phishing exceeds
+            $4.9 million. Traditional blacklist-based defenses cannot keep pace
+            with attackers who spin up convincing fake portals in minutes.
+            PhishGuard was built to close that gap with AI-driven, real-time
+            detection that works even on brand-new domains, providing
+            explainable verdicts that users can trust and auditors can verify.
           </p>
         </div>
 
@@ -117,40 +118,68 @@ export default function AboutPage() {
         <div className="tech-description">
           <p>
             Models are trained on the{" "}
-            <strong>UCI Phishing Websites Dataset</strong>{" "}
-            (<a href="https://archive.ics.uci.edu/dataset/327/phishing+websites" target="_blank" rel="noopener noreferrer">source</a>).
-            The system extracts <strong>28 distinct features</strong> from every URL,
-            grouped into four analytical categories:
+            <strong>UCI Phishing Websites Dataset</strong> (
+            <a
+              href="https://archive.ics.uci.edu/dataset/327/phishing+websites"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              source
+            </a>
+            ). The system extracts <strong>28 distinct features</strong> from
+            every URL, grouped into four analytical categories:
           </p>
           <ul className="feature-list">
-            <li><strong>URL-Based Features (10)</strong> — Pure string and regex parsing: IP address usage, URL length, @ symbols, double-slash redirects, hyphenated domains, subdomain depth, HTTPS tokens, redirect patterns, and non-standard ports.</li>
-            <li><strong>DNS / WHOIS Features (3)</strong> — External network lookups: DNS A-record existence, domain age from WHOIS creation date, and domain registration length from WHOIS expiry date.</li>
-            <li><strong>HTML / Page Features (9)</strong> — HTTP fetch and DOM parsing: favicon origin, external resource ratios, suspicious anchor links, external links in meta/script tags, server form handlers, mailto form submissions, abnormal URL matching WHOIS, mouseover status spoofing, right-click disabling, popup windows, and invisible iframes.</li>
-            <li><strong>API-Based Features (4)</strong> — Third-party intelligence: SSL certificate validity (Python ssl library), Google Safe Browsing threat check, VirusTotal multi-vendor scan aggregation, and OpenPageRank domain authority scoring.</li>
+            <li>
+              <strong>URL-Based Features </strong> — Pure string and regex
+              parsing: IP address usage, URL length, @ symbols, double-slash
+              redirects, hyphenated domains, subdomain depth, HTTPS tokens,
+              redirect patterns, and non-standard ports.
+            </li>
+            <li>
+              <strong>DNS / WHOIS Features </strong> — External network
+              lookups: DNS A-record existence, domain age from WHOIS creation
+              date, and domain registration length from WHOIS expiry date.
+            </li>
+            <li>
+              <strong>HTML / Page Features </strong> — HTTP fetch and DOM
+              parsing: favicon origin, external resource ratios, suspicious
+              anchor links, external links in meta/script tags, server form
+              handlers, mailto form submissions, abnormal URL matching WHOIS,
+              mouseover status spoofing, right-click disabling, popup windows,
+              and invisible iframes.
+            </li>
+            <li>
+              <strong>API-Based Features </strong> — Third-party
+              intelligence: SSL certificate validity (Python ssl library),
+              Google Safe Browsing threat check, VirusTotal multi-vendor scan
+              aggregation, and OpenPageRank domain authority scoring.
+            </li>
           </ul>
         </div>
 
         <div className="tech-description" style={{ marginTop: "48px" }}>
           <p>
             <strong>Application Architecture:</strong> PhishGuard follows a
-            decoupled client-server model. The <strong>React.js frontend</strong>{" "}
-            provides a responsive, dark-themed dashboard for URL submission,
-            real-time result visualization, trust-score gauges, SHAP explanation
-            bars, and WHOIS analysis panels. The <strong>FastAPI backend</strong>{" "}
-            orchestrates the full ML pipeline — feature extraction, multi-model
-            inference, SHAP explanation generation, and WHOIS risk analysis —
-            returning a unified JSON response in a single API call.
+            decoupled client-server model. The{" "}
+            <strong>React.js frontend</strong> provides a responsive,
+            dark-themed dashboard for URL submission, real-time result
+            visualization, trust-score gauges, SHAP explanation bars, and WHOIS
+            analysis panels. The <strong>FastAPI backend</strong> orchestrates
+            the full ML pipeline — feature extraction, multi-model inference,
+            SHAP explanation generation, and WHOIS risk analysis — returning a
+            unified JSON response in a single API call.
           </p>
           <p style={{ marginTop: "16px" }}>
             <strong>ML Stack:</strong> The system runs an ensemble of five
             classifiers — <strong>Logistic Regression</strong> (fast linear
             baseline), <strong>Support Vector Machine</strong> (high-dimensional
             hyperplane separator), <strong>K-Nearest Neighbors</strong>{" "}
-            (instance-based distance learning),{" "}
-            <strong>Random Forest</strong> (bagging ensemble of decision trees),
-            and <strong>XGBoost</strong> (gradient boosted trees). On startup,
-            all models are evaluated on a held-out validation split and the
-            highest F1-scoring model is selected as the primary predictor.
+            (instance-based distance learning), <strong>Random Forest</strong>{" "}
+            (bagging ensemble of decision trees), and <strong>XGBoost</strong>{" "}
+            (gradient boosted trees). On startup, all models are evaluated on a
+            held-out validation split and the highest F1-scoring model is
+            selected as the primary predictor.
           </p>
           <p style={{ marginTop: "16px" }}>
             <strong>Explainability:</strong> Both local (per-prediction) and
@@ -168,7 +197,9 @@ export default function AboutPage() {
               <h3>{group.category}</h3>
               <div className="tech-tags">
                 {group.items.map((item) => (
-                  <span key={item} className="tech-tag">{item}</span>
+                  <span key={item} className="tech-tag">
+                    {item}
+                  </span>
                 ))}
               </div>
             </div>
@@ -215,25 +246,27 @@ export default function AboutPage() {
 
         <div className="acknowledgements-card">
           <p>
-            We sincerely thank our project guide, <strong>Dr. M. Shabana</strong>,
-            Department of Computer Science & Engineering, Neil Gogte Institute of
-            Technology (NGIT), for her invaluable mentorship, technical guidance,
-            and continuous encouragement throughout the conception, development,
-            and evaluation of this project. Her expertise in machine learning and
-            cybersecurity was instrumental in shaping the architecture and
-            research direction of PhishGuard.
+            We sincerely thank our project guide,{" "}
+            <strong>Dr. M. Shabana</strong>, Department of Computer Science &
+            Engineering, Neil Gogte Institute of Technology (NGIT), for her
+            invaluable mentorship, technical guidance, and continuous
+            encouragement throughout the conception, development, and evaluation
+            of this project. Her expertise in machine learning and cybersecurity
+            was instrumental in shaping the architecture and research direction
+            of PhishGuard.
           </p>
           <p>
-            We are grateful to <strong>Neil Gogte Institute of Technology
-            (NGIT)</strong> for providing the computing infrastructure, laboratory
-            resources, and academic environment that made this work possible. The
-            institution's commitment to hands-on, research-driven learning
-            provided the foundation for this project's development.
+            We are grateful to{" "}
+            <strong>Neil Gogte Institute of Technology (NGIT)</strong> for
+            providing the computing infrastructure, laboratory resources, and
+            academic environment that made this work possible. The institution's
+            commitment to hands-on, research-driven learning provided the
+            foundation for this project's development.
           </p>
           <p>
-            We also acknowledge the <strong>UCI Machine Learning Repository</strong>{" "}
-            for providing the foundational dataset used to train and evaluate our
-            models —{" "}
+            We also acknowledge the{" "}
+            <strong>UCI Machine Learning Repository</strong> for providing the
+            foundational dataset used to train and evaluate our models —{" "}
             <a
               href="https://archive.ics.uci.edu/dataset/327/phishing+websites"
               target="_blank"
