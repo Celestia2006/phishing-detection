@@ -377,6 +377,17 @@ export default function ScanPage({ onNewScan }) {
               <span className="card-icon">📊</span>
               Trust Score
             </div>
+            <p
+              style={{
+                fontFamily: "var(--mono)",
+                fontSize: "11px",
+                color: "var(--muted)",
+                marginBottom: "16px",
+              }}
+            >
+              How trustworthy this URL is. High phishing confidence = low trust
+              score.
+            </p>
             <div className="trust-meter">
               <div
                 className="trust-circle-bg"
@@ -552,9 +563,9 @@ export default function ScanPage({ onNewScan }) {
             </p>
 
             {(() => {
-              const features = result.explanation?.global_features?.length
-                ? result.explanation.global_features
-                : result.explanation?.local_features || [];
+              const features = result.explanation?.local_features?.length
+                ? result.explanation.local_features
+                : result.explanation?.global_features || [];
 
               if (!features.length) {
                 return (
@@ -598,7 +609,7 @@ export default function ScanPage({ onNewScan }) {
                         : lookup.safe
                       : feature.label;
                     const color = isRisk ? "var(--danger)" : "var(--accent)";
-                    const tag = isRisk ? "▲ Risk" : "✓ Safe";
+                    const tag = isRisk ? "pushed phishing" : "pushed safe";
 
                     return (
                       <div key={i}>
@@ -691,9 +702,18 @@ export default function ScanPage({ onNewScan }) {
             >
               {[...(result.model_comparison || [])]
                 .sort((a, b) => {
-                  if (a.name === result.prediction.model_used) return -1;
-                  if (b.name === result.prediction.model_used) return 1;
-                  return 0;
+                  const ORDER = [
+                    "XGBoost",
+                    "Random Forest",
+                    "Logistic Regression",
+                    "SVM",
+                    "KNN",
+                  ];
+                  const aIsBest = a.name === result.prediction.model_used;
+                  const bIsBest = b.name === result.prediction.model_used;
+                  if (aIsBest) return -1;
+                  if (bIsBest) return 1;
+                  return ORDER.indexOf(a.name) - ORDER.indexOf(b.name);
                 })
                 .map((model) => {
                   const info = MODEL_INFO[model.name] || {
@@ -1021,38 +1041,8 @@ export default function ScanPage({ onNewScan }) {
           </div>
 
           {/* NEW SCAN BUTTON */}
-          <button
-            onClick={resetScan}
-            style={{
-              background: "linear-gradient(135deg, #00ff8818, #00ff8808)",
-              border: "1px solid var(--accent-mid)",
-              borderRadius: "12px",
-              padding: "12px 28px",
-              color: "var(--accent)",
-              fontFamily: "var(--mono)",
-              fontSize: "16px",
-              fontWeight: "700",
-              cursor: "pointer",
-              transition: "all 0.2s",
-              boxShadow: "0 0 20px #00ff8820",
-              letterSpacing: "1px",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background =
-                "linear-gradient(135deg, #00ff8830, #00ff8815)";
-              e.currentTarget.style.borderColor = "var(--accent)";
-              e.currentTarget.style.boxShadow = "0 0 40px #00ff8840";
-              e.currentTarget.style.transform = "scale(1.03)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background =
-                "linear-gradient(135deg, #00ff8818, #00ff8808)";
-              e.currentTarget.style.borderColor = "var(--accent-mid)";
-              e.currentTarget.style.boxShadow = "0 0 20px #00ff8820";
-              e.currentTarget.style.transform = "scale(1)";
-            }}
-          >
-            ← New Scan
+          <button onClick={resetScan} className="new-scan-btn">
+            ✧ New Scan ✧
           </button>
         </main>
       )}

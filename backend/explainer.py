@@ -130,11 +130,10 @@ def _get_explainer(model, model_name: str):
 
 
 def _direction(shap_val: float) -> str:
-    """Convert a SHAP value to a direction label for frontend colouring."""
     if shap_val > 0.01:
-        return "phishing"
+        return "safe"    # positive → pushes toward legitimate
     if shap_val < -0.01:
-        return "legitimate"
+        return "risk"    # negative → pushes toward phishing
     return "neutral"
 
 
@@ -326,9 +325,7 @@ def _get_global_features(registry) -> list[SHAPFeature]:
     )
 
     # Patch direction — global importance has no direction, mark all neutral
-    for f in global_feats:
-        f.direction = "neutral"
-        f.value     = 0         # not meaningful for global; reset to avoid confusion
+    
 
     # Store in cache — wrap in a minimal ExplanationResult shell
     _global_cache = ExplanationResult(
