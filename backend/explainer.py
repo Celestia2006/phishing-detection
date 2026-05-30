@@ -235,6 +235,7 @@ def explain_local(features: dict, registry) -> ExplanationResult:
 
     # Single-sample: shap_vals is shape (1, n_features) → flatten
     shap_vals_flat = shap_vals[0] if shap_vals.ndim == 2 else shap_vals
+    shap_vals_flat = np.array(shap_vals_flat, dtype=np.float64)
 
     local_feats = _build_shap_features(
         feature_names  = feature_names,
@@ -315,7 +316,7 @@ def _get_global_features(registry) -> list[SHAPFeature]:
         shap_vals = shap_vals[1]
 
     # Global importance = mean absolute SHAP value across all samples
-    mean_abs_shap = np.abs(shap_vals).mean(axis=0)
+    mean_abs_shap = np.array(mean_abs_shap, dtype=np.float64)
 
     global_feats = _build_shap_features(
         feature_names  = feature_names,
