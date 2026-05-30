@@ -234,7 +234,8 @@ def explain_local(features: dict, registry) -> ExplanationResult:
         shap_vals = shap_vals[1]
 
     # Single-sample: shap_vals is shape (1, n_features) → flatten
-    shap_vals_flat = (shap_vals[0] if shap_vals.ndim == 2 else shap_vals).astype(float).tolist()
+    shap_vals_np   = (shap_vals[0] if shap_vals.ndim == 2 else shap_vals).astype(float)
+    shap_vals_flat = shap_vals_np.tolist()
 
     local_feats = _build_shap_features(
         feature_names  = feature_names,
@@ -256,7 +257,7 @@ def explain_local(features: dict, registry) -> ExplanationResult:
     return ExplanationResult(
         local_features   = local_feats,
         base_value       = round(base_val, 4),
-        prediction_delta = round(float(shap_vals_flat.sum()), 4),
+        prediction_delta = round(float(shap_vals_np.sum()), 4),
         global_features  = global_feats,
         model_used       = model_name,
         explanation_type = expl_type,
