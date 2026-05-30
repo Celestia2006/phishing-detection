@@ -140,30 +140,25 @@ def _direction(shap_val: float) -> str:
 def _build_shap_features(
     feature_names : list[str],
     feature_values: list,
-    shap_values   : np.ndarray,
+    shap_values   : list,
     top_n         : int = TOP_N,
 ) -> list[SHAPFeature]:
-    """
-    Sort features by absolute SHAP value and return the top_n as
-    a list of SHAPFeature objects.
-    """
     indexed = sorted(
         enumerate(shap_values),
-        key=lambda x: float(np.abs(np.asarray(x[1])).flatten()[0]),
+        key=lambda x: abs(float(x[1])),
         reverse=True,
     )[:top_n]
 
     return [
         SHAPFeature(
             name       = feature_names[i],
-            value      = int(np.asarray(feature_values[i]).flatten()[0]),
-            shap_value = round(float(np.asarray(shap_values[i]).flatten()[0]), 4),
-            direction  = _direction(float(np.asarray(shap_values[i]).flatten()[0])),
+            value      = int(float(feature_values[i])),
+            shap_value = round(float(shap_values[i]), 4),
+            direction  = _direction(float(shap_values[i])),
             label      = FEATURE_LABELS.get(feature_names[i], feature_names[i]),
         )
         for i, _ in indexed
     ]
-
 
 def _load_validation_data():
     """
