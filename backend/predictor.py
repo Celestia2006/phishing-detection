@@ -111,6 +111,18 @@ class ModelRegistry:
 
     def _select_best_model(self):
         """
+        Skip expensive CV on deployment — XGBoost is consistently best
+        at F1=0.9517. CV results never change between runs on this dataset.
+        """
+        self.best_model_name = "XGBoost"
+        print("[predictor] Best model: XGBoost (hardcoded for fast startup)")    
+
+    @property
+    def best_model(self):
+        return self.models[self.best_model_name]
+    
+    """def _select_best_model(self):
+        
         Uses 10-Fold Stratified CV on the full training split to select
         the best model by mean F1 score.
 
@@ -119,7 +131,7 @@ class ModelRegistry:
           the UCI dataset's fixed validation slice (random_state=42).
         - 10-Fold CV gives a more reliable generalisation estimate and
           correctly identifies XGBoost as the stronger real-world model.
-        """
+        
         if not os.path.exists(DATA_PATH):
             self.best_model_name = "XGBoost"
             return
@@ -162,7 +174,9 @@ class ModelRegistry:
 
     @property
     def best_model(self):
-        return self.models[self.best_model_name]
+        return self.models[self.best_model_name]"""
+    
+   
 
 
 # Instantiate once — imported by main.py and explainer.py

@@ -8,6 +8,8 @@ const ANALYSIS_STEPS = [
   "Calculating trust score...",
 ];
 
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+
 // ─── Plain-English SHAP labels ────────────────────────────────────────────────
 const SHAP_LABELS = {
   ssl_certificate: {
@@ -177,7 +179,7 @@ export default function ScanPage({ onNewScan }) {
     }, 500);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/predict", {
+      const response = await fetch(`${API_URL}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
@@ -222,7 +224,7 @@ export default function ScanPage({ onNewScan }) {
   const handleFeedback = async (correctLabel) => {
     if (!result) return;
     try {
-      await fetch("http://127.0.0.1:8000/feedback", {
+      await fetch(`${API_URL}/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -609,7 +611,7 @@ export default function ScanPage({ onNewScan }) {
                         : lookup.safe
                       : feature.label;
                     const color = isRisk ? "var(--danger)" : "var(--accent)";
-                    const tag = isRisk ? "pushed phishing" : "pushed safe";
+                    const tag = `${isRisk ? "pushed phishing" : "pushed safe"} · ${Math.round(pct)}%`;
 
                     return (
                       <div key={i}>

@@ -36,6 +36,7 @@ import whois
 from datetime import datetime
 from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup
+import subprocess
 
 # ── API key placeholders — load from .env via python-dotenv ──────────────────
 # Add these to your .env file before deploying:
@@ -93,9 +94,12 @@ def _fetch_page(url: str):
 
 
 def _get_whois(domain: str):
-    """Return whois data or None on failure."""
+    """Return whois data or None on failure — with a 5s timeout."""
+    import concurrent.futures
     try:
-        return whois.whois(domain)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
+            future = ex.submit(whois.whois, domain)
+            return future.result(timeout=5)
     except Exception:
         return None
 
@@ -443,29 +447,26 @@ def iframe(soup) -> int:
 
 def ssl_final_state(domain: str) -> int:
     """
-    Checks SSL certificate validity using Python's ssl library — no API key needed.
-     1 if a valid, non-expired certificate exists.
-    -1 if SSL is missing, expired, or self-signed.
-     0 if the check cannot be completed.
+    Checks SSL certificate validity using curl subprocess call.
+     1  valid certificate
+    -1  invalid / self-signed / expired
+     0  unreachable (inconclusive)
     """
     try:
-        ctx = ssl.create_default_context()
-        with ctx.wrap_socket(
-            socket.create_connection((domain, 443), timeout=5),
-            server_hostname=domain,
-        ) as s:
-            cert = s.getpeercert()
-            # Check expiry
-            expiry_str = cert.get("notAfter", "")
-            if expiry_str:
-                expiry = datetime.strptime(expiry_str, "%b %d %H:%M:%S %Y %Z")
-                if expiry < datetime.now():
-                    return -1   # expired cert
-            return 1
-    except ssl.SSLCertVerificationError:
-        return -1   # invalid / self-signed
-    except (socket.timeout, ConnectionRefusedError, OSError):
-        return 0    # couldn't reach port 443 — inconclusive
+        result = subprocess.run(
+            ["curl", "-Is", "--max-time", "1", "--ssl-reqd", f"https://{domain}"],
+            capture_output=True,
+            text=True,
+            timeout=4,
+        )
+        if result.returncode == 0:
+            return 1   # SSL handshake succeeded
+        elif result.returncode in (35, 51, 58, 60):
+            return -1  # curl SSL-specific error codes → bad cert
+        else:
+            return 0   # unreachable / other error
+    except subprocess.TimeoutExpired:
+        return 0
     except Exception:
         return -1
 
@@ -500,9 +501,12 @@ def google_index(url: str) -> int:
     try:
         resp = requests.post(endpoint, json=payload, timeout=5)
         data = resp.json()
-        # If 'matches' key exists and is non-empty, URL is flagged
-        return -1 if data.get("matches") else 1
+        result = -1 if data.get("matches") else 1
+        print(f"[google_index] url={url} result={result} response={data}")  # ← add this
+        print(result)
+        return result
     except Exception:
+        print(f"[google_index] EXCEPTION: {e}")  # ← and this
         return 0
 
 
@@ -630,66 +634,67 @@ FEATURE_ORDER = [
 
 
 def extract_features(url: str) -> dict:
-    """
-    Main entry point.
-
-    Parameters
-    ----------
-    url : str
-        Raw URL to analyse (e.g. 'http://paypal-secure.xyz/login').
-
-    Returns
-    -------
-    dict with keys matching FEATURE_ORDER, all values in {-1, 0, 1}.
-    Raises ValueError if the URL cannot be parsed.
-    """
     parsed = urlparse(url)
     if not parsed.netloc:
         raise ValueError(f"Could not parse URL: {url!r}")
 
     domain = _get_domain(parsed)
 
-    # Network calls (done once, shared across features)
-    soup, resp = _fetch_page(url)
-    w = _get_whois(domain)
+    # Run ALL network calls in parallel
+    import concurrent.futures
+    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+        f_page   = executor.submit(_fetch_page, url)
+        f_whois  = executor.submit(_get_whois, domain)
+        f_ssl    = executor.submit(ssl_final_state, domain)
+        f_dns    = executor.submit(dns_record, domain)
+        f_google = executor.submit(google_index, url)
+        f_vt     = executor.submit(statistical_report, url)
+        f_pr     = executor.submit(page_rank, domain)
+
+        soup, resp = f_page.result()
+        w          = f_whois.result()
+        ssl_val    = f_ssl.result()
+        dns_val    = f_dns.result()
+        google_val = f_google.result()
+        vt_val     = f_vt.result()
+        pr_val     = f_pr.result()
 
     features = {
-        # URL-based
-        "having_IP_Address":       having_IP_Address(parsed),
-        "URL_Length":              url_length(url),
-        "Shortining_Service":      shortening_service(url),
-        "having_At_Symbol":        having_at_symbol(url),
-        "double_slash_redirecting": double_slash_redirecting(url),
-        "Prefix_Suffix":           prefix_suffix(parsed),
-        "having_Sub_Domain":       having_sub_domain(parsed),
-        "HTTPS_token":             https_token(parsed),
-        "Redirect":                redirect(url),
-        "port":                    port(parsed),
+        # URL-based (no network, instant)
+        "having_IP_Address":           having_IP_Address(parsed),
+        "URL_Length":                  url_length(url),
+        "Shortining_Service":          shortening_service(url),
+        "having_At_Symbol":            having_at_symbol(url),
+        "double_slash_redirecting":    double_slash_redirecting(url),
+        "Prefix_Suffix":               prefix_suffix(parsed),
+        "having_Sub_Domain":           having_sub_domain(parsed),
+        "HTTPS_token":                 https_token(parsed),
+        "Redirect":                    redirect(url),
+        "port":                        port(parsed),
 
-        # DNS / WHOIS
-        "DNSRecord":               dns_record(domain),
-        "age_of_domain":           age_of_domain(w),
+        # DNS / WHOIS (pre-computed above)
+        "DNSRecord":                   dns_val,
+        "age_of_domain":               age_of_domain(w),
         "Domain_registeration_length": domain_registration_length(w),
 
-        # HTML / page
-        "Favicon":                 favicon(soup, url, domain),
-        "Request_URL":             request_url(soup, domain),
-        "URL_of_Anchor":           url_of_anchor(soup, domain),
-        "Links_in_tags":           links_in_tags(soup, domain),
-        "SFH":                     sfh(soup, domain),
-        "Submitting_to_email":     submitting_to_email(soup),
-        "Abnormal_URL":            abnormal_url(w, domain),
-        "on_mouseover":            on_mouseover(soup),
-        "RightClick":              right_click(soup),
-        "popUpWidnow":             popup_window(soup),
-        "Iframe":                  iframe(soup),
+        # HTML / page (pre-computed soup)
+        "Favicon":                     favicon(soup, url, domain),
+        "Request_URL":                 request_url(soup, domain),
+        "URL_of_Anchor":               url_of_anchor(soup, domain),
+        "Links_in_tags":               links_in_tags(soup, domain),
+        "SFH":                         sfh(soup, domain),
+        "Submitting_to_email":         submitting_to_email(soup),
+        "Abnormal_URL":                abnormal_url(w, domain),
+        "on_mouseover":                on_mouseover(soup),
+        "RightClick":                  right_click(soup),
+        "popUpWidnow":                 popup_window(soup),
+        "Iframe":                      iframe(soup),
 
-        # API-based
-        "SSLfinal_State":          ssl_final_state(domain),
-        "Google_Index":            google_index(url),
-        "Statistical_report":      statistical_report(url),
-        "Page_Rank":               page_rank(domain),
+        # API-based (pre-computed above)
+        "SSLfinal_State":              ssl_val,
+        "Google_Index":                google_val,
+        "Statistical_report":          vt_val,
+        "Page_Rank":                   pr_val,
     }
 
-    # Return in the fixed order the model expects
     return {k: features[k] for k in FEATURE_ORDER}

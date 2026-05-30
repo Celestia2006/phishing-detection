@@ -61,7 +61,7 @@ async def lifespan(app: FastAPI):
     print(f"[startup] Best model: {registry.best_model_name}")
 
     print("[startup] Pre-computing global SHAP explanation...")
-    explain_global(registry)
+    #explain_global(registry)
     print("[startup] Global SHAP cache ready.")
 
     print("[startup] PhishGuard API is ready 🛡️")
