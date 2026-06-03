@@ -502,11 +502,8 @@ def google_index(url: str) -> int:
         resp = requests.post(endpoint, json=payload, timeout=5)
         data = resp.json()
         result = -1 if data.get("matches") else 1
-        print(f"[google_index] url={url} result={result} response={data}")  # ← add this
-        print(result)
         return result
     except Exception:
-        print(f"[google_index] EXCEPTION: {e}")  # ← and this
         return 0
 
 

@@ -117,6 +117,7 @@ export default function ScanPage({ onNewScan }) {
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
+  const [stepsComplete, setStepsComplete] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [copied, setCopied] = useState(false);
 
@@ -168,15 +169,19 @@ export default function ScanPage({ onNewScan }) {
     setResult(null);
     setScanning(true);
     setCurrentStep(0);
+    setStepsComplete(false);
     setFeedback(null);
 
+    // Steps advance every 700ms but STOP at the last step and wait for the API.
+    // The loading indicator stays visible until setResult() is called.
     const stepInterval = setInterval(() => {
       setCurrentStep((prev) => {
         if (prev < ANALYSIS_STEPS.length - 1) return prev + 1;
         clearInterval(stepInterval);
+        setStepsComplete(true); // triggers the "still working" pulse
         return prev;
       });
-    }, 500);
+    }, 700);
 
     try {
       const response = await fetch(`${API_URL}/predict`, {
@@ -211,6 +216,7 @@ export default function ScanPage({ onNewScan }) {
       });
     } finally {
       setScanning(false);
+      setStepsComplete(false);
       clearInterval(stepInterval);
     }
   };
@@ -317,6 +323,34 @@ export default function ScanPage({ onNewScan }) {
                     </div>
                   ))}
                 </div>
+
+                {stepsComplete && (
+                  <div
+                    style={{
+                      marginTop: "18px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      padding: "10px 14px",
+                      borderRadius: "8px",
+                      background: "var(--accent-dim)",
+                      border: "1px solid var(--accent-mid)",
+                      animation: "pulse 1.6s ease-in-out infinite",
+                    }}
+                  >
+                    <span style={{ fontSize: "14px" }}>⏳</span>
+                    <span
+                      style={{
+                        fontFamily: "var(--mono)",
+                        fontSize: "11px",
+                        color: "var(--accent)",
+                        letterSpacing: "0.5px",
+                      }}
+                    >
+                      Finalizing results — this can take a few seconds...
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </div>

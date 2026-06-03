@@ -116,11 +116,6 @@ _global_cache: Optional[ExplanationResult] = None
 # ── helpers ───────────────────────────────────────────────────────────────────
 
 def _get_explainer(model, model_name: str):
-    """
-    Build the appropriate SHAP explainer for the model type.
-    - TreeExplainer  for Random Forest and XGBoost (fast, exact)
-    - LinearExplainer for Logistic Regression
-    """
     if model_name == "Logistic Regression":
         return shap.LinearExplainer(model, shap.maskers.Independent(
             np.zeros((1, 28))

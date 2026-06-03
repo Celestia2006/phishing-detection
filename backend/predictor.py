@@ -88,20 +88,19 @@ class ModelRegistry:
         self._select_best_model()
 
     def _load_models(self):
-        """Load all .pkl files from the models directory."""
         missing = []
         for name, path in MODEL_PATHS.items():
             if not os.path.exists(path):
                 missing.append(path)
                 continue
-            self.models[name] = joblib.load(path)  # same for all models now
+            self.models[name] = joblib.load(path)
 
         if missing:
             raise FileNotFoundError(
                 f"Missing model files — have you run train_models.ipynb?\n"
                 f"  {chr(10).join(missing)}"
             )
-
+            
         if not os.path.exists(SCALER_PATH):
             raise FileNotFoundError(
                 f"Missing scaler: {SCALER_PATH}\n"

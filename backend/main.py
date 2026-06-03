@@ -261,6 +261,8 @@ async def predict(request: ScanRequest):
         registry    = get_registry()
         explanation = explain_local(features, registry)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Explanation failed: {e}")
 
     try:
