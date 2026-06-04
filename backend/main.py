@@ -404,7 +404,7 @@ async def retrain():
 
     ⚠️  This is a blocking call — the server will be unresponsive
     during training (typically 10–30 seconds for this dataset size).
-    For production, move to a background task.
+    For production, move to a background task. 
     """
     result = retrain_models()
 

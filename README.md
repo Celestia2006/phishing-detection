@@ -5,24 +5,24 @@ WHOIS domain analysis, and a real-time React frontend.
 
 ## 📁 Project Structure
 
-frontend/        → React.js UI
-backend/         → FastAPI REST API
-notebooks/       → EDA, training, evaluation
-data/            → UCI Phishing Dataset
+frontend/        → React.js UI<br>
+backend/         → FastAPI REST API<br>
+notebooks/       → EDA, training, evaluation<br>
+data/            → UCI Phishing Dataset<br>
 
 ## ⚙️ Local Setup
 
 ### Backend
-cd backend
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn main:app --reload
+cd backend<br>
+python -m venv venv<br>
+venv\Scripts\activate<br>
+pip install -r requirements.txt<br>
+uvicorn main:app --reload<br>
 
 ### Frontend
-cd frontend
-npm install
-npm start
+cd frontend<br>
+npm install<br>
+npm start<br>
 
 ## 🧠 Models
 - Logistic Regression
