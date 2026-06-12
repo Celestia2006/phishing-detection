@@ -490,7 +490,7 @@ def google_index(url: str) -> int:
         f"?key={GOOGLE_SAFE_BROWSING_API_KEY}"
     )
     payload = {
-        "client": {"clientId": "phishguard", "clientVersion": "1.0"},
+        "client": {"clientId": "phishlens", "clientVersion": "1.0"},
         "threatInfo": {
             "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING", "UNWANTED_SOFTWARE"],
             "platformTypes": ["ANY_PLATFORM"],

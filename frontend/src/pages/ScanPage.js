@@ -132,7 +132,7 @@ export default function ScanPage({ onNewScan }) {
     if (!result) return;
     const p = result.prediction;
     const summary = [
-      `PhishGuard AI — Scan Summary`,
+      `PhishLens AI — Scan Summary`,
       `─────────────────────────────`,
       `URL      : ${url}`,
       `Verdict  : ${p.is_phishing ? "⚠ Phishing" : "✓ Safe"}`,

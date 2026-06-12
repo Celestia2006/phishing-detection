@@ -66,7 +66,7 @@ const MODELS = [
     name: "XGBoost",
     icon: "⚡",
     type: "Gradient Boosted Trees",
-    desc: "Sequentially builds decision trees where each new tree corrects the residual errors of the ensemble so far. Uses gradient descent optimization with L1/L2 regularization to prevent overfitting. Delivers state-of-the-art accuracy on structured tabular data and is the primary production model for PhishGuard.",
+    desc: "Sequentially builds decision trees where each new tree corrects the residual errors of the ensemble so far. Uses gradient descent optimization with L1/L2 regularization to prevent overfitting. Delivers state-of-the-art accuracy on structured tabular data and is the primary production model for PhishLens.",
     metrics: {
       accuracy: 98.4,
       precision: 98.2,
@@ -1153,7 +1153,7 @@ export default function CompareModels({ onNavigate }) {
           Compare <span className="accent">Models</span>
         </h1>
         <p className="compare-subtitle">
-          PhishGuard runs a dynamic ensemble of 5 distinct ML classifiers,
+          PhishLens runs a dynamic ensemble of 5 distinct ML classifiers,
           automatically selecting the optimal model based on historical F1
           scores. Here is how each one performs across five evaluation metrics.
         </p>

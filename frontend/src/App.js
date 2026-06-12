@@ -19,7 +19,7 @@ function LandingPage({ onNavigate }) {
           Before It Starts
         </h1>
         <p className="landing-subtitle">
-          PhishGuard AI uses explainable machine learning, real-time WHOIS
+          PhishLens AI uses explainable machine learning, real-time WHOIS
           lookups, and SHAP analysis to detect phishing threats with 98%+
           confidence — in seconds.
         </p>
@@ -54,14 +54,14 @@ function LandingPage({ onNavigate }) {
 
       <div className="section">
         <p className="section-label">The Process</p>
-        <h2 className="section-title">How PhishGuard Works</h2>
+        <h2 className="section-title">How PhishLens Works</h2>
         <div className="steps-grid">
           <div className="step-card">
             <div className="step-number">01 —</div>
             <div className="step-icon-lg">🔗</div>
             <div className="step-title">Submit a URL</div>
             <p className="step-desc">
-              Paste any suspicious link. PhishGuard accepts full URLs, shortened
+              Paste any suspicious link. PhishLens accepts full URLs, shortened
               links, or IP-based addresses.
             </p>
           </div>
@@ -103,7 +103,7 @@ function LandingPage({ onNavigate }) {
             <p className="impact-body">
               Phishing attacks account for over 90% of data breaches worldwide.
               Attackers create convincing fake pages in minutes — traditional
-              blacklists can't keep up. PhishGuard uses AI to detect threats
+              blacklists can't keep up. PhishLens uses AI to detect threats
               dynamically, even on brand-new domains.
             </p>
             <button className="btn-primary" onClick={() => onNavigate("scan")}>
@@ -173,7 +173,7 @@ function LandingPage({ onNavigate }) {
           Find out in seconds.
         </h2>
         <p className="final-cta-sub">
-          Paste a URL and let PhishGuard's AI give you a full breakdown — free,
+          Paste a URL and let PhishLens's AI give you a full breakdown — free,
           fast, and explainable.
         </p>
         <button className="btn-primary" onClick={() => onNavigate("scan")}>
@@ -209,7 +209,7 @@ export default function App() {
         {/* ─── NAV ─── */}
         <nav>
           <div className="nav-logo" onClick={() => handleNavigate("home")}>
-            <div className="logo">PhishGuard AI</div>
+            <div className="logo">PhishLens AI</div>
             <div className="tagline">
               Real-Time AI Powered Phishing Detection
             </div>

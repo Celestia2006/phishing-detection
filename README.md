@@ -1,4 +1,4 @@
-# 🛡️ PhishGuard — Adaptive Explainable Phishing Detection System
+# 🛡️ PhishLens — Adaptive Explainable Phishing Detection System
 
 A machine learning-powered phishing website detection system with explainable AI,
 WHOIS domain analysis, and a real-time React frontend.

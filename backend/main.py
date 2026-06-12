@@ -1,7 +1,7 @@
 """
 main.py
 -------
-FastAPI entry point for the PhishGuard backend.
+FastAPI entry point for the PhishLens backend.
 
 Exposes six endpoints:
   POST /predict          — scan a URL, returns prediction + SHAP + WHOIS
@@ -64,15 +64,15 @@ async def lifespan(app: FastAPI):
     #explain_global(registry)
     print("[startup] Global SHAP cache ready.")
 
-    print("[startup] PhishGuard API is ready 🛡️")
+    print("[startup] PhishLens API is ready 🛡️")
     yield
-    print("[shutdown] PhishGuard API shutting down.")
+    print("[shutdown] PhishLens API shutting down.")
 
 
 # ── app ───────────────────────────────────────────────────────────────────────
 
 app = FastAPI(
-    title       = "PhishGuard API",
+    title       = "PhishLens API",
     description = "Adaptive Explainable Phishing Detection — NGIT CSE 2025-26",
     version     = "1.0.0",
     lifespan    = lifespan,
@@ -223,56 +223,32 @@ def _serialise_result(
 
 @app.post("/predict", summary="Scan a URL for phishing")
 async def predict(request: ScanRequest):
-    """
-    Main endpoint — scans a URL end-to-end.
-
-    Pipeline:
-      1. Extract 28 features from the URL (parsing + DNS + HTML + APIs)
-      2. Run all three models, select best by F1
-      3. Generate local + global SHAP explanation
-      4. Perform WHOIS domain analysis
-      5. Return everything in one unified response
-
-    The frontend calls this single endpoint and distributes the response
-    across TrustScore, SHAPExplanation, WHOISPanel, and ModelComparison.
-    """
     url = request.url.strip()
-
     if not url.startswith(("http://", "https://")):
         url = "http://" + url
-
     try:
-        # Step 1 — Feature extraction
         features = extract_features(url)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=f"Invalid URL: {e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Feature extraction failed: {e}")
-
     try:
-        # Step 2 — Prediction
         from predictor import predict as run_predict
         result = run_predict(features)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction failed: {e}")
-
     try:
-        # Step 3 — SHAP explanation
         registry    = get_registry()
         explanation = explain_local(features, registry)
     except Exception as e:
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Explanation failed: {e}")
-
     try:
-        # Step 4 — WHOIS analysis
         domain       = _extract_domain(url)
         whois_result = analyze_whois(domain)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"WHOIS analysis failed: {e}")
-
-    # Step 5 — Serialise and return
     return _serialise_result(result, explanation, whois_result)
 
 
@@ -376,7 +352,7 @@ async def submit_feedback(request: FeedbackRequest):
     summary = get_feedback_summary()
 
     return {
-        "message"       : "Feedback saved. Thank you for helping improve PhishGuard!",
+        "message"       : "Feedback saved. Thank you for helping improve PhishLens!",
         "total_feedback": summary.get("total", 0),
     }
 

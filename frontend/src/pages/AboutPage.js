@@ -41,10 +41,10 @@ export default function AboutPage() {
           NGIT CSE 2025-26
         </div>
         <h1 className="about-title">
-          About <span className="accent">PhishGuard</span>
+          About <span className="accent">PhishLens</span>
         </h1>
         <p className="about-subtitle">
-          PhishGuard is an adaptive, explainable phishing detection system that
+          PhishLens is an adaptive, explainable phishing detection system that
           combines machine learning with SHAP (SHapley Additive exPlanations)
           and real-time WHOIS domain analysis. It extracts 28 features from any
           URL, runs them through an ensemble of ML classifiers, and returns a
@@ -53,10 +53,10 @@ export default function AboutPage() {
         </p>
       </section>
 
-      {/* ─── WHY PHISHGUARD EXISTS ─── */}
+      {/* ─── WHY PhishLens EXISTS ─── */}
       <section className="about-section">
         <p className="section-label">The Mission</p>
-        <h2 className="section-title">Why PhishGuard Exists</h2>
+        <h2 className="section-title">Why PhishLens Exists</h2>
 
         <div className="stats-paragraph">
           <p>
@@ -73,7 +73,7 @@ export default function AboutPage() {
             while the average cost of a data breach involving phishing exceeds
             $4.9 million. Traditional blacklist-based defenses cannot keep pace
             with attackers who spin up convincing fake portals in minutes.
-            PhishGuard was built to close that gap with AI-driven, real-time
+            PhishLens was built to close that gap with AI-driven, real-time
             detection that works even on brand-new domains, providing
             explainable verdicts that users can trust and auditors can verify.
           </p>
@@ -84,7 +84,7 @@ export default function AboutPage() {
             <div className="mission-icon">🔬</div>
             <h3>Explainable AI</h3>
             <p>
-              Traditional phishing detectors are black boxes. PhishGuard uses
+              Traditional phishing detectors are black boxes. PhishLens uses
               SHAP to show exactly <em>why</em> a URL was flagged, making every
               result transparent and auditable.
             </p>
@@ -160,7 +160,7 @@ export default function AboutPage() {
 
         <div className="tech-description" style={{ marginTop: "48px" }}>
           <p>
-            <strong>Application Architecture:</strong> PhishGuard follows a
+            <strong>Application Architecture:</strong> PhishLens follows a
             decoupled client-server model. The{" "}
             <strong>React.js frontend</strong> provides a responsive,
             dark-themed dashboard for URL submission, real-time result
@@ -253,7 +253,7 @@ export default function AboutPage() {
             encouragement throughout the conception, development, and evaluation
             of this project. Her expertise in machine learning and cybersecurity
             was instrumental in shaping the architecture and research direction
-            of PhishGuard.
+            of PhishLens.
           </p>
           <p>
             We are grateful to{" "}
